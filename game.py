@@ -24,7 +24,7 @@ TILE_HEIGHT = 90
 TILE_MARGIN = 15
 FONT_NAME = 'malgungothic'
 
-# --- 폰트 설정 (개선됨: 강제 다운로드 제거) ---
+# --- 폰트 설정 ---
 def get_font_path():
     """
     시스템에 설치된 한글 폰트를 안전하게 찾습니다.
@@ -62,13 +62,26 @@ def get_font_path():
     return None # 없으면 None 반환하여 Pygame 기본 폰트 사용
 
 # ============================================================================
-# NASA API 영역 (절대 수정 금지 구역)
+# [수정됨] NASA API 영역: 보안을 위해 하드코딩된 키를 제거했습니다.
 # ============================================================================
-NASA_API_KEY = "q3EvTmLhK3eFq2rIPNRyMdY2FeBvFG35PhNn91bG"
+# 기존: NASA_API_KEY = "..." (지워짐)
+# 변경: 환경변수에서 가져오기
+NASA_API_KEY = os.environ.get("NASA_API_KEY")
 NASA_APOD_URL = "https://api.nasa.gov/planetary/apod"
+
+# 키가 없을 경우 경고 메시지 (실행 시 터미널에 뜸)
+if not NASA_API_KEY:
+    print("------------------------------------------------------------")
+    print("[경고] NASA_API_KEY 환경변수가 설정되지 않았습니다.")
+    print("이미지를 불러오지 못할 수 있습니다. README.md를 참고해주세요.")
+    print("------------------------------------------------------------")
 
 def fetch_nasa_apod_image():
     """NASA APOD API로부터 오늘의 우주 이미지를 가져옵니다."""
+    # 키가 없으면 바로 종료 (에러 방지)
+    if not NASA_API_KEY:
+        return None
+
     try:
         params = {'api_key': NASA_API_KEY}
         response = requests.get(NASA_APOD_URL, params=params, timeout=10)
